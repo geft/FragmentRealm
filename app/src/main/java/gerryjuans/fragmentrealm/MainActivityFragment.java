@@ -3,6 +3,7 @@ package gerryjuans.fragmentrealm;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,29 +30,70 @@ public class MainActivityFragment extends Fragment implements Database {
     }
 
     @Override
-    public void addUser() {
+    public User addUser() {
         User user = new User(getNameString(), getEmailString());
-        realmHelper.addUser(user);
 
+        if (!isNameEmpty() && !isEmailEmpty()) {
+            realmHelper.addUser(user);
+        }
+
+        clearFields();
+
+        return user;
     }
 
     @Override
+    public User loadUser() {
+        User user = new User();
+
+        if (isNameEmpty() && !isEmailEmpty()) {
+            user = getUserByEmail(getEmailString());
+        } else if (!isNameEmpty()) {
+            user = getUserByName(getNameString());
+        }
+
+        if (user != null) {
+            getNameEditText().setText(user.name);
+            getEmailEditText().setText(user.email);
+        }
+
+        return user;
+    }
+
+    private void clearFields() {
+        getNameEditText().getText().clear();
+        getEmailEditText().getText().clear();
+    }
+
     public User getUserByName(String name) {
         return realmHelper.getUser(RealmHelper.NAME, name);
     }
 
-    @Override
     public User getUserByEmail(String email) {
         return realmHelper.getUser(RealmHelper.EMAIL, email);
     }
 
     private String getNameString() {
-        EditText editText = (EditText) getActivity().findViewById(R.id.editTextName);
-        return editText.getText().toString();
+        return getNameEditText().getText().toString();
+    }
+
+    private EditText getNameEditText() {
+        return (EditText) getActivity().findViewById(R.id.editTextName);
     }
 
     private String getEmailString() {
-        EditText editText = (EditText) getActivity().findViewById(R.id.editTextEmail);
-        return editText.getText().toString();
+        return getEmailEditText().getText().toString();
+    }
+
+    private EditText getEmailEditText() {
+        return (EditText) getActivity().findViewById(R.id.editTextEmail);
+    }
+
+    private boolean isNameEmpty() {
+        return TextUtils.isEmpty(getNameString());
+    }
+
+    private boolean isEmailEmpty() {
+        return TextUtils.isEmpty(getEmailString());
     }
 }

@@ -17,6 +17,17 @@ public class RealmHelper {
     public RealmHelper(Context context) {
         RealmConfiguration configuration = new RealmConfiguration.Builder(context).build();
         Realm.setDefaultConfiguration(configuration);
+
+        clearData();
+    }
+
+    private void clearData() {
+        if (BuildConfig.DEBUG) {
+            Realm realm = getInstance();
+            realm.beginTransaction();
+            realm.deleteAll();
+            realm.commitTransaction();
+        }
     }
 
     private Realm getInstance() {
@@ -33,6 +44,11 @@ public class RealmHelper {
     public User getUser(String field, String match) {
         Realm realm = getInstance();
         RealmResults<User> results = realm.where(User.class).equalTo(field, match).findAll();
-        return results.get(0);
+
+        if (results.size() == 0) {
+            return null;
+        } else {
+            return results.get(0);
+        }
     }
 }

@@ -5,9 +5,7 @@ package gerryjuans.fragmentrealm;
  */
 interface Database {
 
-    void addUser();
+    User addUser();
 
-    User getUserByName(String name);
-
-    User getUserByEmail(String email);
+    User loadUser();
 }
